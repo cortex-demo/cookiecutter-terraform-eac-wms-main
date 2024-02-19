@@ -1,0 +1,75 @@
+# Environment as Code. Declarative
+#_________________________________________________________
+#Tags and Definition of who is creating what.
+#_________________________________________________________
+#Core Resource Provisioning
+#_________________________________________________________
+eac_core:
+  description: "{{cookiecutter.description}}" 
+  name: "{{cookiecutter.application_name}}"   
+  app_short_name: "{{cookiecutter.application_short_name}}"
+  zone_redundant: "{{cookiecutter.zone_redundant}}"
+  location: "{{cookiecutter.location}}"
+  app_insights: {{cookiecutter.application_insights}}
+  immutability: "{{cookiecutter.immutability}}"
+  connect_hub: {{cookiecutter.connect_hub}}
+
+# Networking for Application landing Zone
+#_________________________________________________________
+malz_vnet:
+  address_space: ["172.23.12.0/22"]
+  create_new: true
+
+# Compute is of various Type ( Azure Spring Enterprise)
+#_________________________________________________________
+compute_ase:
+  runtime_subnet_address_space: ["172.23.15.0/24"]
+  apps_subnet_address_space: ["172.23.13.0/24"]
+  firewall_subnet_address_space: "172.23.14.0/26"
+  sku_name: "E0"
+  zone_redundant: true
+  devtool_portal: false
+  cidr_ranges: ["10.1.0.0/16", "10.2.0.0/16", "10.3.0.1/16"]
+  build_agent_pool_size: "S2"
+  enabled: false
+
+{%- if cookiecutter.user_managed_identity_enabled == 'true'%}
+# IDENTITY  # USER MANAGED IDENTITY
+# ________________________________________________________
+user_managed_identity:
+  enabled: true
+{%- endif %}
+    
+# PAAS Service Event Hub
+#_________________________________________________________
+paas_eventhub:
+  eventhub_name: "{{cookiecutter.event_hub_name}}"  
+  zone_redundant: {{cookiecutter.event_hub_zone_redundant}}   
+  partition: {{cookiecutter.event_hub_partitions}}           
+  consumer_group: "{{cookiecutter.event_hub_consumer_group}}"  
+  enabled: true  
+
+{%- if cookiecutter.storage_enabled == 'true'%}
+# PAAS Service Storage
+#_________________________________________________________
+paas_storage:
+  enabled: true        
+{%- endif %}
+
+# PAAS Service CosmosDB
+#_________________________________________________________
+paas_cosmosdb:
+  cosmos_container: "{{cookiecutter.cosmos_DB_container}}"     
+  enabled: true
+
+
+{%- if cookiecutter.redis_enabled == 'true'%}
+# PAAS Redis
+#_________________________________________________________
+paas_redis:
+  enabled: true               
+  sku_name: "Premium"         
+  capacity: 1                
+  family: "P"               
+  zones: [1,2,3]            
+{%- endif %}
